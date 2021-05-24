@@ -50,6 +50,10 @@
     width: `${width}px`,
     height: `${height + (showController ? controllerHeight : 0)}px`,
   });
+  let timestampStyle: string;
+  $: timestampStyle = inlineCss({
+    right: `${timestampRgihtWidth}px`
+  })
 
 
   const updateScale = (
@@ -183,22 +187,25 @@
     });
   });
   
-  // afterUpdate(() => {
-  //   setTimeout(() => {
-  //     if (!firstChild && frame.children && frame.children.length) {
-  //       let frameWidth = frame.clientWidth
-  //       firstChild = frame.children[0]
-  //       let replayerWrapperWidth = firstChild.clientWidth
-  //       if (replayerWrapperWidth < frameWidth) {
-  //         timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
-  //       }
-  //       // timestampRgihtWidth
-  //       console.log('frame', frame, 'frameWidth', frameWidth)
-  //       console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
-  //       console.log('timestampRgihtWidth', timestampRgihtWidth)
-  //     }
-  //   }, 300)
-  // })
+  afterUpdate(() => {
+    setTimeout(() => {
+      if (!firstChild && frame.children && frame.children.length) {
+        let frameWidth = frame.clientWidth
+        firstChild = frame.children[0]
+        let replayerWrapperWidth = frameWidth
+        try {
+          replayerWrapperWidth = (width / replayer.iframe.offsetWidth) * firstChild.clientWidth
+        } catch (error) {}
+        if (replayerWrapperWidth < frameWidth) {
+          timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
+        }
+        // timestampRgihtWidth
+        console.log('frame', frame, 'frameWidth', frameWidth)
+        console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
+        console.log('timestampRgihtWidth', timestampRgihtWidth)
+      }
+    }, 300)
+  })
 
   onDestroy(() => {
     fullscreenListener && fullscreenListener();
@@ -206,15 +213,14 @@
 </script>
 
 <div class="rr-player" bind:this={player} style={playerStyle}>
-  <div class="rr-player__frame" bind:this={frame} {style}>
-    {#if showTimeStamp}
-      {#if timestamp}
-        <div class="rr-timestamp">
-          {parseTime(timestamp, '{y}-{m}-{d} {h}:{i}:{s}')}
-        </div>
-      {/if}
+  {#if showTimeStamp}
+    {#if timestamp}
+      <div class="rr-timestamp" style={timestampStyle}>
+        {parseTime(timestamp, '{y}-{m}-{d} {h}:{i}:{s}')}
+      </div>
     {/if}
-  </div>
+  {/if}
+  <div class="rr-player__frame" bind:this={frame} {style} />
   {#if replayer}
     <Controller
       bind:this={controller}
@@ -241,7 +247,6 @@
 
   .rr-player__frame {
     overflow: hidden;
-    position: relative;
   }
 
   .replayer-wrapper {
@@ -258,7 +263,6 @@
   .rr-timestamp {
     position: absolute;
     top: 20px;
-    right: 20px;
     color: #DD8C16;
     font-size: 13px;
     z-index: 1;
