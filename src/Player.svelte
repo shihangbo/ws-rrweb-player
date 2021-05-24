@@ -27,6 +27,7 @@
 
   export const getMirror = () => mirror;
 
+  let firstChild = null
   const controllerHeight = 80;
   let player: HTMLElement;
   let frame: HTMLElement;
@@ -76,7 +77,14 @@
 
   export const toggleFullscreen = () => {
     if (player) {
-      isFullscreen() ? exitFullscreen() : openFullscreen(player);
+      // isFullscreen() ? exitFullscreen() : openFullscreen(player);
+      if (isFullscreen()) {
+        exitFullscreen()
+        getTimestampRgihtWidth(width)
+      } else {
+        openFullscreen(player);
+        getTimestampRgihtWidth(window.innerWidth)
+      }
     }
   };
 
@@ -126,9 +134,23 @@
     timestamp = e.detail.t
   }
 
-  let firstChild = null
+  function getTimestampRgihtWidth(wd:number):void {
+    if (!firstChild && frame.children && frame.children.length) {
+      setTimeout(() => {
+        let frameWidth = frame.clientWidth
+        firstChild = frame.children[0]
+        let replayerWrapperWidth = frameWidth
+        try {
+          replayerWrapperWidth = Math.min(wd / replayer.iframe.offsetWidth, height / replayer.iframe.offsetHeight, 1) * firstChild.clientWidth
+        } catch (error) {}
+        if (replayerWrapperWidth < frameWidth) {
+          timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
+        }
+      }, 300)
+    }
+  }
+  
   onMount(() => {
-    console.log('firstChild', firstChild)
     // runtime type check
     if (speedOption !== undefined && typeOf(speedOption) !== 'array') {
       throw new Error('speedOption must be array');
@@ -188,23 +210,7 @@
   });
   
   afterUpdate(() => {
-    setTimeout(() => {
-      if (!firstChild && frame.children && frame.children.length) {
-        let frameWidth = frame.clientWidth
-        firstChild = frame.children[0]
-        let replayerWrapperWidth = frameWidth
-        try {
-          replayerWrapperWidth = (width / replayer.iframe.offsetWidth) * firstChild.clientWidth
-        } catch (error) {}
-        if (replayerWrapperWidth < frameWidth) {
-          timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
-        }
-        // timestampRgihtWidth
-        console.log('frame', frame, 'frameWidth', frameWidth)
-        console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
-        console.log('timestampRgihtWidth', timestampRgihtWidth)
-      }
-    }, 300)
+    getTimestampRgihtWidth(width)
   })
 
   onDestroy(() => {

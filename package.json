@@ -1,6 +1,6 @@
 {
   "name": "bxs-rrweb-player",
-  "version": "1.0.6",
+  "version": "1.0.8",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.0",
     "@rollup/plugin-node-resolve": "^7.0.0",
