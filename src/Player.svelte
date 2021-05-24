@@ -185,12 +185,15 @@
 </script>
 
 <div class="rr-player" bind:this={player} style={playerStyle}>
-  {#if showTimeStamp}
-    <div class="rr-timestamp">
-      {parseTime(timestamp, '{y}年{m}月{d}日 {h}:{i}:{s}')}
-    </div>
-  {/if}
-  <div class="rr-player__frame" bind:this={frame} {style} />
+  <div class="rr-player__frame" bind:this={frame} {style}>
+    {#if showTimeStamp}
+      {#if timestamp}
+        <div class="rr-timestamp">
+          {parseTime(timestamp, '{y}年{m}月{d}日 {h}:{i}:{s}')}
+        </div>
+      {/if}
+    {/if}
+  </div>
   {#if replayer}
     <Controller
       bind:this={controller}
@@ -234,7 +237,7 @@
   .rr-timestamp {
     position: absolute;
     top: 20px;
-    right: 30px;
+    right: 22%;
     color: red;
     font-size: 16px;
     z-index: 1;
