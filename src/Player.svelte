@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, afterUpdate } from 'svelte';
   import { Replayer, unpack, mirror } from 'rrweb';
   import type { eventWithTime, playerConfig } from 'rrweb/typings/types';
   import {
@@ -23,6 +23,7 @@
   export let showController: boolean = true;
   export let tags: Record<string, string> = {};
   export let showTimeStamp: boolean = false;
+  export let timestampRgihtWidth: number = 20
 
   export const getMirror = () => mirror;
 
@@ -49,6 +50,11 @@
     width: `${width}px`,
     height: `${height + (showController ? controllerHeight : 0)}px`,
   });
+  let timestampStyle: string;
+  $: timestampStyle = inlineCss({
+    right: `${timestampRgihtWidth}px`
+  })
+
 
   const updateScale = (
     el: HTMLElement,
@@ -120,7 +126,9 @@
     timestamp = e.detail.t
   }
 
+  let firstChild = null
   onMount(() => {
+    console.log('firstChild', firstChild)
     // runtime type check
     if (speedOption !== undefined && typeOf(speedOption) !== 'array') {
       throw new Error('speedOption must be array');
@@ -178,6 +186,21 @@
       }
     });
   });
+  
+  afterUpdate(() => {
+    if (!firstChild && frame.children && frame.children.length) {
+      let frameWidth = frame.clientWidth
+      firstChild = frame.children[0]
+      let replayerWrapperWidth = firstChild.clientWidth
+      if (replayerWrapperWidth < frameWidth) {
+        timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
+      }
+      // timestampRgihtWidth
+      console.log('frame', frame, 'frameWidth', frameWidth)
+      console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
+      console.log('timestampRgihtWidth', timestampRgihtWidth)
+    }
+  })
 
   onDestroy(() => {
     fullscreenListener && fullscreenListener();
@@ -185,15 +208,14 @@
 </script>
 
 <div class="rr-player" bind:this={player} style={playerStyle}>
-  <div class="rr-player__frame" bind:this={frame} {style}>
-    {#if showTimeStamp}
-      {#if timestamp}
-        <div class="rr-timestamp">
-          {parseTime(timestamp, '{y}-{m}-{d} {h}:{i}:{s}')}
-        </div>
-      {/if}
+  {#if showTimeStamp}
+    {#if timestamp}
+      <div class="rr-timestamp" style={timestampStyle}>
+        {parseTime(timestamp, '{y}-{m}-{d} {h}:{i}:{s}')}
+      </div>
     {/if}
-  </div>
+  {/if}
+  <div class="rr-player__frame" bind:this={frame} {style} />
   {#if replayer}
     <Controller
       bind:this={controller}
@@ -237,7 +259,6 @@
   .rr-timestamp {
     position: absolute;
     top: 20px;
-    right: 22%;
     color: #DD8C16;
     font-size: 16px;
     z-index: 1;
