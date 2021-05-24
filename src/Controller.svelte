@@ -20,11 +20,12 @@
   export let replayer: Replayer;
   export let showController: boolean;
   export let autoPlay: boolean;
-  export let skipInactive: boolean;
+  // export let skipInactive: boolean;
   export let speedOption: number[];
   export let speed = speedOption.length ? speedOption[0] : 1;
   export let tags: Record<string, string> = {};
 
+  let skipInactive = false;
   let currentTime = 0;
   let timestamp = 0
   $: {

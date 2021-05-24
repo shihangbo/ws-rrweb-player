@@ -16,7 +16,7 @@
   export let width: number = 600;
   export let height: number = 466;
   export let events: eventWithTime[] = [];
-  export let skipInactive: boolean = true;
+  // export let skipInactive: boolean = true;
   export let autoPlay: boolean = true;
   export let speedOption: number[] = [1, 2, 4, 8];
   export let speed: number = 1;
@@ -188,18 +188,20 @@
   });
   
   afterUpdate(() => {
-    if (!firstChild && frame.children && frame.children.length) {
-      let frameWidth = frame.clientWidth
-      firstChild = frame.children[0]
-      let replayerWrapperWidth = firstChild.clientWidth
-      if (replayerWrapperWidth < frameWidth) {
-        timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
+    setTimeout(() => {
+      if (!firstChild && frame.children && frame.children.length) {
+        let frameWidth = frame.clientWidth
+        firstChild = frame.children[0]
+        let replayerWrapperWidth = firstChild.clientWidth
+        if (replayerWrapperWidth < frameWidth) {
+          timestampRgihtWidth = (frameWidth - replayerWrapperWidth) / 2 + 20
+        }
+        // timestampRgihtWidth
+        console.log('frame', frame, 'frameWidth', frameWidth)
+        console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
+        console.log('timestampRgihtWidth', timestampRgihtWidth)
       }
-      // timestampRgihtWidth
-      console.log('frame', frame, 'frameWidth', frameWidth)
-      console.log('firstChild', firstChild, 'replayerWrapperWidth', replayerWrapperWidth)
-      console.log('timestampRgihtWidth', timestampRgihtWidth)
-    }
+    }, 300)
   })
 
   onDestroy(() => {
@@ -223,7 +225,6 @@
       {showController}
       {autoPlay}
       {speedOption}
-      {skipInactive}
       {tags}
       on:fullscreen={() => toggleFullscreen()}
       on:changeTimestamp={(e) => changeTimestamp(e)}/>
