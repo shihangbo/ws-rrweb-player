@@ -12,7 +12,7 @@
     createEventDispatcher,
     afterUpdate,
   } from 'svelte';
-  import { formatTime } from './utils';
+  import { formatTime, parseTime } from './utils';
   import Switch from './components/Switch.svelte';
 
   const dispatch = createEventDispatcher();
@@ -26,6 +26,10 @@
   export let tags: Record<string, string> = {};
 
   let currentTime = 0;
+  let timestamp = 0
+  $: {
+    dispatch('changeTimestamp', { t: timestamp })
+  }
   $: {
     dispatch('ui-update-current-time', { payload: currentTime });
   }
@@ -53,10 +57,14 @@
     position: string;
   };
   let customEvents: CustomEvent[];
+  let startTime = 0;
   $: customEvents = (() => {
     const { context } = replayer.service.state;
     const totalEvents = context.events.length;
     const start = context.events[0].timestamp;
+    if (startTime === 0) {
+      startTime = start
+    }
     const end = context.events[totalEvents - 1].timestamp;
     const customEvents: CustomEvent[] = [];
 
@@ -93,6 +101,8 @@
 
     function update() {
       currentTime = replayer.getCurrentTime();
+      // let start = replayer.getMetaData() && replayer.getMetaData().startTime
+      timestamp = startTime + currentTime
 
       if (currentTime < meta.totalTime) {
         timer = requestAnimationFrame(update);

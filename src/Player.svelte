@@ -9,11 +9,12 @@
     isFullscreen,
     onFullscreenChange,
     typeOf,
+    parseTime,
   } from './utils';
   import Controller from './Controller.svelte';
 
-  export let width: number = 1024;
-  export let height: number = 576;
+  export let width: number = 600;
+  export let height: number = 466;
   export let events: eventWithTime[] = [];
   export let skipInactive: boolean = true;
   export let autoPlay: boolean = true;
@@ -21,6 +22,7 @@
   export let speed: number = 1;
   export let showController: boolean = true;
   export let tags: Record<string, string> = {};
+  export let showTimeStamp: boolean = false;
 
   export const getMirror = () => mirror;
 
@@ -113,6 +115,11 @@
     controller.goto(timeOffset);
   };
 
+  let timestamp = 0
+  function changeTimestamp (e:CustomEvent):void {
+    timestamp = e.detail.t
+  }
+
   onMount(() => {
     // runtime type check
     if (speedOption !== undefined && typeOf(speedOption) !== 'array') {
@@ -177,6 +184,27 @@
   });
 </script>
 
+<div class="rr-player" bind:this={player} style={playerStyle}>
+  {#if showTimeStamp}
+    <div class="rr-timestamp">
+      {parseTime(timestamp, '{y}年{m}月{d}日 {h}:{i}:{s}')}
+    </div>
+  {/if}
+  <div class="rr-player__frame" bind:this={frame} {style} />
+  {#if replayer}
+    <Controller
+      bind:this={controller}
+      {replayer}
+      {showController}
+      {autoPlay}
+      {speedOption}
+      {skipInactive}
+      {tags}
+      on:fullscreen={() => toggleFullscreen()}
+      on:changeTimestamp={(e) => changeTimestamp(e)}/>
+  {/if}
+</div>
+
 <style global>
   @import 'rrweb/dist/rrweb.min.css';
 
@@ -203,19 +231,13 @@
   .replayer-wrapper > iframe {
     border: none;
   }
+  .rr-timestamp {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: red;
+    font-size: 16px;
+    z-index: 1;
+  }
 </style>
 
-<div class="rr-player" bind:this={player} style={playerStyle}>
-  <div class="rr-player__frame" bind:this={frame} {style} />
-  {#if replayer}
-    <Controller
-      bind:this={controller}
-      {replayer}
-      {showController}
-      {autoPlay}
-      {speedOption}
-      {skipInactive}
-      {tags}
-      on:fullscreen={() => toggleFullscreen()} />
-  {/if}
-</div>
