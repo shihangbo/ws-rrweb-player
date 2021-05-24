@@ -1,5 +1,5 @@
 {
-  "name": "bxs-rrweb-player",
+  "name": "ws-rrweb-player",
   "version": "1.0.8",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.0",
