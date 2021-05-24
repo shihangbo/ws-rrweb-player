@@ -189,7 +189,7 @@
     {#if showTimeStamp}
       {#if timestamp}
         <div class="rr-timestamp">
-          {parseTime(timestamp, '{y}年{m}月{d}日 {h}:{i}:{s}')}
+          {parseTime(timestamp, '{y}-{m}-{d} {h}:{i}:{s}')}
         </div>
       {/if}
     {/if}
@@ -238,7 +238,7 @@
     position: absolute;
     top: 20px;
     right: 22%;
-    color: red;
+    color: #DD8C16;
     font-size: 16px;
     z-index: 1;
   }
